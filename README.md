@@ -62,6 +62,9 @@ Ensure FFmpeg is installed and added to your system PATH.
 Make sure your API keys are valid and have sufficient quota.
 The pipeline automatically skips already-generated assets to optimize performance.
 
+🧠 Technical Highlights: "Smart Resume"
+The pipeline includes a custom checkpoint system. Before calling external APIs, the engine verifies the local existence of script_text in the database and asset files in the project directory. This ensures resilience against network failures and optimizes API quota usage.
+
 📄 License
 This project was developed as part of a technical assessment for ASTRONOVA SYNERGIES LLP.
 
