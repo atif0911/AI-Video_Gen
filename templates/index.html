@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstroNova AI Video Generator</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      .container {
+        border: 1px solid #ccc;
+        padding: 2rem;
+        border-radius: 8px;
+      }
+      input {
+        padding: 10px;
+        width: 70%;
+      }
+      button {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .project-list {
+        margin-top: 2rem;
+      }
+      .status-pending {
+        color: orange;
+      }
+      .status-completed {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <style>
+    /* Add some modern styling */
+    .project-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; }
+    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+    .status-completed { background: #d4edda; color: #155724; }
+    .status-rendering, .status-visuals, .status-voiceover { background: #fff3cd; color: #856404; animation: pulse 1.5s infinite; }
+    .status-failed { background: #f8d7da; color: #721c24; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    video { width: 100%; max-width: 400px; border-radius: 8px; }
+</style>
+
+<div class="container">
+    <h1>🎥 AstroNova AI Pipeline</h1>
+    <div class="input-group">
+        <input type="text" id="topicInput" placeholder="Enter a topic...">
+        <button onclick="startGeneration()">Generate Video</button>
+    </div>
+
+    <div id="projectList" class="project-list">
+        </div>
+</div>
+
+<script>
+    async function startGeneration() {
+        const topic = document.getElementById('topicInput').value;
+        if(!topic) return alert("Please enter a topic");
+        await fetch('/create', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ topic: topic })
+        });
+        updateStatus(); // Immediate update
+    }
+
+    async function updateStatus() {
+        const response = await fetch('/status');
+        const projects = await response.json();
+        const list = document.getElementById('projectList');
+        
+        list.innerHTML = projects.map(p => `
+            <div class="project-card">
+                <div>
+                    <h3>${p.topic}</h3>
+                    <span class="status-badge status-${p.status}">${p.status}</span>
+                </div>
+                <div>
+                    ${p.status === 'completed' ? `
+                        <video controls>
+                            <source src="/video/${p.video_path.split('static/output/')[1]}" type="video/mp4">
+                        </video>
+                        <br>
+                        ${p.youtube_link ? `<a href="${p.youtube_link}" target="_blank">View on YouTube</a>` : ''}
+                    ` : p.status === 'failed' ? `
+                        <button onclick="startGeneration('${p.topic}')">Retry</button>
+                    ` : `
+                        <div class="loader">Processing...</div>
+                    `}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Refresh the status every 3 seconds
+    // setInterval(updateStatus, 3000);
+    window.onload = updateStatus;
+</script>
+  </body>
+</html>

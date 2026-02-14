@@ -1,0 +1,20 @@
+# Python environment
+venv/
+__pycache__/
+*.pyc
+
+# Environment Variables & Secrets
+.env
+client_secret.json
+token.json
+token.pickle
+
+# Local Database
+instance/
+
+# Generated Assets (Keep the folders, ignore the files)
+static/output/*
+!static/output/.gitkeep
+
+# OS specific
+.DS_Store
